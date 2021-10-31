@@ -46,9 +46,45 @@ JOIN CHUYENBAY CB ON (LB.MACB=CB.MACB)
 WHERE CB.SBDEN = 'ORD' AND NV.LOAINV = 1
 ORDER BY LB.MACB ASC, PC.NGAYDI DESC 
 
-select CB.MACB, LB.NGAYDI, NV.MANV, TEN
-  from CHUYENBAY CB, NHANVIEN NV, PHANCONG PC, LICHBAY LB
-  where (CB.MACB = PC.MACB and PC.NGAYDI = LB.NGAYDI and NV.MANV = PC.MANV and CB.SBDEN = 'ORD' and LB.MACB = CB.MACB)
-
   -- 8, Cho biết các chuyến bay (mã số chuyến bay, ngày đi và tên của phi công) trong đó phi công có mã số 1001 được phân công lái.
- 
+ Select PC.MACB, PC.NGAYDI, NV.MANV , NV.TEN
+From PHANCONG PC 
+JOIN LICHBAY LB ON (PC.MACB=LB.MACB AND PC.NGAYDI= LB.NGAYDI)
+JOIN NHANVIEN NV ON (NV.MANV = PC.MANV) 
+JOIN CHUYENBAY CB ON (LB.MACB=CB.MACB)
+WHERE nv.LOAINV = 1 and nv.MANV ='1001'
+
+-- 9, Cho biết thông tin(mã chuyến bay, sân bay đi, giờ đi, giờ đến, ngày đi) của những chuyến bay hạ cánh xuống DEN. 
+--Các chuyến bay được liệt kê theo ngày giảm dần, và sân bay xuất phát tăng dần 
+Select CB.MACB, cb.GIODI, cb.GIODEN, cb.SBDI, lb.NGAYDI
+From CHUYENBAY cb JOIN LICHBAY lb on (cb.MACB = lb.macb)  
+WHERE cb.SBDEN = 'DEN'
+order by Lb.NGAYDI desc, cb.SBDI asc
+
+-- 10, Với mỗi phi công, cho biết hãng sản xuất và mã loại máy bay mà phi công này có khả năng lái. 
+--Xuất tên phi công, hãng sản xuất và MALOAI
+select  nv.TEN, lmb.HANGSX, lmb.MALOAI
+From NHANVIEN nv left join KHANANG KN on(nv.MANV = kn.MANV)
+left join  LOAIMB lmb on (kn.MALOAI = lmb.MALOAI)
+where nv.LOAINV = 1
+
+select  nv.TEN, lmb.HANGSX, lmb.MALOAI
+From NHANVIEN nv join KHANANG KN on(nv.MANV = kn.MANV)
+join  LOAIMB lmb on (kn.MALOAI = lmb.MALOAI)
+where nv.LOAINV = 1
+
+-- 11, Cho biết mã phi công, tên phi công đã lái máy bay trong chuyến bay mã số 100, và ngày 11/1/2000
+Select nv.MANV, nv.TEN
+From NHANVIEN nv 
+join PHANCONG pc on (nv.MANV = pc.MANV)
+Join LICHBAY lb on (pc.NGAYDI = lb.NGAYDI and pc.MACB = lb.MACB)
+Where Pc.MACB = '100' and pc.NGAYDI = ' 11/1/2000'
+
+--12, Cho biết mã chuyến bay, mã nhân viên, tên nhân viên được phân công  vào chuyến bay xuất phát ngày 10/31/2000. 
+--tại sân bay MIA vào lúc 20h30
+Select nv.MANV, nv.TEN, pc.MACB
+From NHANVIEN nv 
+join PHANCONG pc on (nv.MANV = pc.MANV)
+Join LICHBAY lb on (pc.NGAYDI = lb.NGAYDI and pc.MACB = lb.MACB)
+Join CHUYENBAY cb on ( lb.macb  = cb.MACB)
+Where lb.NGAYDI ='10/31/2000' and cb.sbdi= 'MIA' and cb.GIODI = '20:30'
