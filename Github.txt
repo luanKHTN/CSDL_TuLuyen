@@ -1,0 +1,12 @@
+cách dùng Gihut
+tải file xuống trong CMD dùng Ggit cloneit clone + đường link đường dẫn trên github
+Lần đầu đầy file lên gihub 
+git config --global user.mail "nvluan0109@gmail.com"
+git config --global user.name " nvluan0109"
+
+update thư mục code
+bước 1: git add .
+bước 2: git commit -am"noi dung ghi chú "
+bước 3 : git push
+lấy từ github về
+git pull
