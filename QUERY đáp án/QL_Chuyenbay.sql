@@ -1,4 +1,4 @@
-﻿use DATA_ChuyenBay
+﻿use QL_ChuyenBay12
 --1, Cho biết mã số tên phi công, địa chỉ, điện thoại của các phi công đã từng lái máy bay 747
 Select NV.MANV, NV.TEN, NV.DCHI
 From NHANVIEN NV jOIN KHANANG KN ON NV.MANV = KN.MANV
@@ -147,3 +147,29 @@ SELECT SBDEN, NGAYDI, COUNT(*) AS 'SOLUONG'
  FROM CHUYENBAY 
  JOIN LICHBAY ON ( CHUYENBAY.MACB = LICHBAY.MACB)
 	GROUP BY SBDEN, NGAYDI
+--21 Với mỗi lịch bay,
+-- cho biết mã chuyến bay, ngày đi, cùng số lượng nhân viên không phải là phi công của chuyến bay đó
+select lb.ngaydi, lb.macb, count (pc.manv) as soluongnhanvienkhongthamgia
+from NHANVIEN nv
+Join PHANCONG PC on ( nv.MANV = pc.MANV)
+Join LICHBAY lb on	( pc.MACB=lb.MACB and pc.NGAYDI = lb.NGAYDI)
+where nv.LOAINV=0
+group by lb.ngaydi, lb.macb
+ -- Câu 22: Số lượng chuyến bay xuất phát từ sân bay MIA vào ngày 11/01/2000
+ select count(*) as SOLUONGXUATPHATTAIMIA 
+ From CHUYENBAY cb join LICHBAY lb on ( cb.MACB=lb.MACB)
+ where cb.SBDI = 'MIA' and lb.NGAYDI ='11/01/2000'
+ Group by cb.SBDI 
+
+ SELECT COUNT(*) SOLUONG
+  FROM CHUYENBAY CB, LICHBAY LB
+  WHERE CB.SBDI = 'MIA' AND LB.NGAYDI = '11/01/2000' AND LB.MACB = CB.MACB
+-- Câu 23; Với mỗi chuyến bay cho biết mã chuyến bay, ngày đi, số lượng nhân viên được phân công trên chuyến bay đó, sắp theo thứ tự 
+  -- giảm dần số lượng
+  -- Giải tương tự câu 21
+-- Câu 24: Với mỗi chuyến bay, cho biết mã chuyến bay, ngày đi, cùng với số lượng hành khách đã đặt chỗ của chuyến bay đó, 
+-- sắp xếp theo thứ tự giảm dần của số lượng
+
+-- Tương tự những câu trên
+
+-- Câu 25: Với mỗi chuyến bay, cho biết mã chuyến bay, ngày đi, tổng lương của phi hành đoàn. sắp tăng dần tổng lương
