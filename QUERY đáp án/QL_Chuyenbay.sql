@@ -1,4 +1,4 @@
-﻿use QL_ChuyenBay12
+﻿use [QL-ChuyenBay]
 --1, Cho biết mã số tên phi công, địa chỉ, điện thoại của các phi công đã từng lái máy bay 747
 Select NV.MANV, NV.TEN, NV.DCHI
 From NHANVIEN NV jOIN KHANANG KN ON NV.MANV = KN.MANV
