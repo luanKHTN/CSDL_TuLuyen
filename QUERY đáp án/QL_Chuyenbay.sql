@@ -1,4 +1,4 @@
-﻿use [QL-ChuyenBay]
+﻿use DATA_ChuyenBay
 --1, Cho biết mã số tên phi công, địa chỉ, điện thoại của các phi công đã từng lái máy bay 747
 Select NV.MANV, NV.TEN, NV.DCHI
 From NHANVIEN NV jOIN KHANANG KN ON NV.MANV = KN.MANV
@@ -173,3 +173,51 @@ group by lb.ngaydi, lb.macb
 -- Tương tự những câu trên
 
 -- Câu 25: Với mỗi chuyến bay, cho biết mã chuyến bay, ngày đi, tổng lương của phi hành đoàn. sắp tăng dần tổng lương
+Select lb.MACB, lb.NGAYDI, sum(LUONG) as [Tongluong]
+From NHANVIEN nv
+Join PHANCONG pc on ( nv.MANV = pc.MANV)
+Join LICHBAY lb on ( pc.MACB=lb.MACB and pc.NGAYDI = lb.NGAYDI)
+Group by lb.MACB, lb.NGAYDI
+
+-- 26: Cho biết lương trung bình của các nhân viên không là phi công
+Select AVG(luong) as 'LuongTB'
+From NHANVIEN nv
+Where nv.LOAINV = 0
+
+ -- 27: Cho biết mức lương trung bình của các phi công
+ Select AVG(luong) as 'LuongTBPhiCong'
+ From NHANVIEN nv
+ Where nv.LOAINV =1
+ -- 28: Với mỗi loại máy bay, cho biết số lượng chuyến bay đã bay trên loại máy bay đó hạ cánh xuống sân bay ORD
+ --Xuất mã loại máy bay và số lượng chuyến bay.
+ Select Lb.MALOAI, count(*) as 'SLChuyenbay'
+ From CHUYENBAY cb Join LICHBAY lb On (cb.MACB= lb.MACB)
+ Where cb.SBDEN = 'ORD'
+ Group by MALOAI
+
+ -- Câu 29: Cho biết sân bay(SBDI) và số lượng chuyến bay có nhiều hơn 2 chuyến bay xuất phát trong khoảng 10h đến 22h
+ Select CB.SBDI, count(*) as Soluong 
+ From CHUYENBAY CB
+ Where cb.GIODI between '10:00' and '22:00'
+ Group by cb.GIODI
+ having count(*)>2
+
+ -- Câu 30: Cho biết tên phi công đã được phân công vào ít nhất 2 chuyến bay trong cùng một ngày
+ Select nv.TEN
+ From NHANVIEN nv Join PHANCONG pc On (nv.MANV= pc.MANV)
+ Where nv.LOAINV =1
+ Group by nv.TEN
+ Having count(*)>=2
+
+ -- Câu 31: Cho biết mã chuyến bay và ngày đi của những chuyến bay có ít hơn 3 hành khách đặt chỗ
+ Select lb.MACB, dc.NGAYDI
+ From DATCHO dc Join LICHBAY lb On (dc.MACB=lb.MACB and dc.NGAYDI=lb.NGAYDI)
+ Group by lb.MACB, dc.NGAYDI
+ Having count(dc.MAKH) >=3
+
+  -- Câu 32: Cho biết số hiệu máy bay và loại máy bay mà phi công có mã 1001 được phân lái trên 2 lần
+ Select lb.SOHIEU,lb.MALOAI
+ From PHANCONG pc Join LICHBAY lb On (pc.NGAYDI=lb.NGAYDI and pc.MACB=lb.MACB)
+ Where pc.MANV ='1001'
+ Group by lb.SOHIEU,lb.MALOAI
+ Having count(*)>2
