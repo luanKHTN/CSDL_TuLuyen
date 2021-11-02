@@ -88,17 +88,13 @@ join PHANCONG pc on (nv.MANV = pc.MANV)
 Join LICHBAY lb on (pc.NGAYDI = lb.NGAYDI and pc.MACB = lb.MACB)
 Join CHUYENBAY cb on ( lb.macb  = cb.MACB)
 Where lb.NGAYDI ='10/31/2000' and cb.sbdi= 'MIA' and cb.GIODI = '20:30'
-+-- 13, Cho biết thông tin về chuyến bay mà phi công Quang đã lái(mã chuyến bay, số hiệu, mã loại, hãng sản xuất, )
-Select LICHBAY.MACB, LICHBAY.SOHIEU, LICHBAY.MALOAI, LOAIMB.HANGSX
+-- 13, Cho biết thông tin về chuyến bay mà phi công Quang đã lái(mã chuyến bay, số hiệu, mã loại, hãng sản xuất, )
+ Select LICHBAY.MACB, LICHBAY.SOHIEU, LICHBAY.MALOAI, LOAIMB.HANGSX
 From NHANVIEN NV
 Join PHANCONG ON (NV.MANV = PHANCONG.MANV)
 JOIN LICHBAY ON ( PHANCONG.MACB = LICHBAY.MACB AND PHANCONG.NGAYDI = LICHBAY.NGAYDI)
 JOIN LOAIMB ON ( LICHBAY.MALOAI= LOAIMB.MALOAI)
 WHERE NV.TEN = 'QUANG' AND NV.LOAINV=1
-
-select PC.MACB, SOHIEU, LMB.MALOAI, LMB.HANGSX
-    from NHANVIEN NV, PHANCONG PC, LOAIMB LMB, LICHBAY LB, CHUYENBAY CB
-    where NV.MANV = PC.MANV and NV.TEN = 'Quang' and LB.MACB = PC.MACB and LB.MALOAI = LMB.MALOAI and LB.NGAYDI = PC.NGAYDI and LB.MACB = CB.MACB
 
 	-- 14, Cho biết những phi công chưa được phân công chuyến bay nào
 SELECT *
@@ -221,3 +217,84 @@ Where nv.LOAINV = 0
  Where pc.MANV ='1001'
  Group by lb.SOHIEU,lb.MALOAI
  Having count(*)>2
+ 
+ -- Câu 33: Với mỗi hãng sản xuất, cho biết số lượng loại máy bay mà hãng đó sản xuất.
+ --Xuất ra hãng sản xuất và số lượng.
+ Select lmb.HangSX , COUNT(lmb.maloai) 
+ From LOAIMB lmb Join MAYBAY mb On (lmb.MALOAI = mb.MALOAI)
+ Group by lmb.HANGSX
+
+-- Câu 34: Cho biết hãng sản xuất, mã loại và số hiệu của máy bay được sử dụng nhiều nhất
+Select lmb.HANGSX, lb.SOHIEU, lb.MALOAI, count(*)
+ From LOAIMB lmb Join LICHBAY lb On (lmb.MALOAI = lb.MALOAI)
+ Group by lmb.HANGSX, lb.SOHIEU, lb.MALOAI 
+ Having count(*) >=
+					ALL(select count(*)
+						From LOAIMB lmb1 Join LICHBAY lb1 On (lmb1.MALOAI = lb1.MALOAI)
+						Group by lmb1.HANGSX, lb1.SOHIEU, lb1.MALOAI 
+						)
+
+-- Câu 35: Cho biết tên nhân viên được phân công đi nhiều chuyến bay 
+Select nv.TEN,count(*) as SLPhanCong
+From NHANVIEN nv Join PHANCONG pc On (nv.MANV =pc.MANV)
+Where nv.LOAINV = 0
+Group by nv.TEN
+Having count(*) >=ALL
+						(Select count(*)
+						From NHANVIEN nv1 Join PHANCONG pc On (nv1.MANV =pc.MANV)
+						Where nv1.LOAINV = 0
+						Group by nv1.TEN
+						)
+
+-- Câu 36: Cho biết thông tin của phi công(Tên, địa chỉ, điện thoại) lái nhiều chuyến bay nhất
+Select nv.TEN,nv.DCHI, nv.DTHOAI
+From NHANVIEN nv Join PHANCONG pc On (nv.MANV =pc.MANV)
+Where nv.LOAINV = 1
+Group by nv.TEN,nv.DCHI, nv.DTHOAI
+Having count(*)    >=ALL
+						(Select count(*)
+						From NHANVIEN nv1 Join PHANCONG pc On (nv1.MANV =pc.MANV)
+						Where nv1.LOAINV = 1
+						Group by nv1.TEN, nv1.DCHI, nv1.DTHOAI
+						)
+-- Câu 37: Cho biết sân bay(SBDEN) và số lượng chuyến bay của sân bay có ít chuyến bay đáp xuống nhất
+Select cb.SBDEN, count(*)
+From CHUYENBAY cb left Join LICHBAY lb On (cb.MACB =lb.MACB) 
+Group by cb.SBDEN
+Having COUNT(*) <= all
+						(Select count(*)
+							From CHUYENBAY cb1 left Join LICHBAY lb1 On (cb1.MACB =lb1.MACB) 
+							Group by cb1.SBDEN
+							)
+-- Câu 38: Cho biết sân bay(SBDI) và số lượng chuyến bay của sân bay có nhiều chuyến bay xuất phát nhất
+Select cb.SBDI, count(*) as SLChuyenbay
+From CHUYENBAY cb left Join LICHBAY lb On (cb.MACB =lb.MACB) 
+Group by cb.SBDI
+Having COUNT(*) >= all
+						(Select count(*)
+							From CHUYENBAY cb1 left Join LICHBAY lb1 On (cb1.MACB =lb1.MACB) 
+							Group by cb1.SBDI
+							)
+-- Câu 39: Cho biết tên, địa chỉ, điện thoại của khách hàng đã đi trên nhiều chuyến bay nhất
+Select kh.TEN, kh.DCHI, kh.DTHOAI
+From KHACHHANG kh Join DATCHO dc On (kh.MAKH= dc.MAKH)
+Group by kh.TEN, kh.DCHI, kh.DTHOAI
+Having COUNT (*) >= all (
+							Select count(*)
+							From  DATCHO dc1 
+							Group by MAKH
+						)
+-- Câu 40: Cho biết mã số, tên, lương của các phi công có khả năng lái nhiều máy bay nhất
+Select nv.MANV, nv.LUONG, nv.TEN, count(*)
+From NHANVIEN nv left Join KHAnang kn On (nv.MANV = kn.MANV)
+Where nv.LOAINV =1
+Group by nv.MANV, nv.LUONG, nv.TEN
+having count(*) >= all (
+					Select count(*)
+					From KHANANG kn1
+					Group by kn1.MANV
+					)
+
+
+
+							
