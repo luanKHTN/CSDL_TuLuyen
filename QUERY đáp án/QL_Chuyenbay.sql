@@ -294,7 +294,41 @@ having count(*) >= all (
 					From KHANANG kn1
 					Group by kn1.MANV
 					)
+-- Câu 41: Cho biết thông tin của nhân viên(mã, tên, lương) của nhân viên 
+--có lương cao nhất
 
-
-
-							
+-- Cách 1
+Select nv.MANV, nv.TEN, nv.LUONG
+From NHANVIEN nv
+Where nv.LUONG >= ALL(
+						Select nv1.LUONG
+						From NHANVIEN nv1
+						)
+-- Cách 2
+Select nv.MANV, nv.TEN, nv.LUONG
+From NHANVIEN nv
+Where nv.LUONG =	(
+						Select Max(LUONG)
+						From NHANVIEN nv
+					)
+-- Câu 42: Cho biết tên, địa chỉ, của các nhân viên LƯƠNG cao nhất trong phi hành đoàn
+--(các nhân viên được phân công trong 1 chuyến bay mà người đó tham gia
+Select distinct nv.TEN, nv.DCHI
+From NHANVIEN nv Join PHANCONG pc On ( nv.MANV = pc.MANV)
+Where nv.LUONG =		(
+						Select Max(LUONG)
+						From NHANVIEN nv Join PHANCONG pc On ( nv.MANV = pc.MANV)
+						)
+ 
+Select nv.TEN, nv.DCHI, nv.LUONG
+From NHANVIEN nv
+Where eXISTS (
+				Select *
+				From NHANVIEN nv1 Join PHANCONG pc On ( nv1.MANV = pc.MANV)
+				Where nv1.LUONG =		(
+											Select Max(LUONG)
+											From NHANVIEN nv2 Join PHANCONG pc On ( nv2.MANV = pc.MANV)
+											))
+Select pc.MACB, pc.NGAYDI
+From NHANVIEN nv1 Join PHANCONG pc On ( nv1.MANV = pc.MANV)
+Group by pc.MACB, pc.NGAYDI
